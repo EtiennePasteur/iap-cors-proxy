@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>IAP - CORS - Proxy</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';"/>
+    <style>
+        @font-face {
+            font-family: 'montserrat';
+            font-weight: 400;
+            src: url('../assets/fonts/Montserrat-Regular.ttf');
+        }
+
+        @font-face {
+            font-family: 'montserrat';
+            font-weight: 800;
+            src: url('../assets/fonts/Montserrat-ExtraBold.ttf');
+        }
+
+        body {
+            background: linear-gradient(234.42deg, #5903CF 0%, #DA00FD 100%);
+            width: 350px;
+            height: 750px;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: montserrat, sans-serif;
+            font-weight: 400;
+            color: white;
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 25px;
+        }
+
+        .inputs {
+            margin: 15px 0 0;
+            width: 90%;
+        }
+
+        .input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            height: 40px;
+            font-size: 17px;
+            font-family: montserrat, sans-serif;
+            border: 1px solid #ffffff;
+            border-radius: 4px;
+            margin: 5px 10px 15px;
+            padding: 0 4px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        .inputfile {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .inputfile + label {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 4px;
+            color: white;
+            background-color: #e26262;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .inputfile:focus + label,
+        .inputfile + label:hover {
+            background-color: #e2626280;
+            transform: scale(1.1);
+        }
+
+        .dropzone {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .buttons {
+            margin-top: 25px;
+        }
+
+        button {
+            width: 80px;
+            height: 50px;
+            font-size: 30px;
+            border: none;
+            border-radius: 30px;
+            margin: 0 15px;
+            background: linear-gradient(45deg, #ffe0e0 0%, #ff37e6 100%);
+            cursor: pointer;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+        }
+
+        .terminal {
+            margin-top: 25px;
+            background-color: #2b2b2b;
+            border: thick double white;
+            width: 90%;
+            height: 135px;
+            overflow: scroll;
+            overflow-x: hidden;
+            color: white;
+            font-size: 12px;
+            padding: 5px;
+            box-sizing: border-box;
+            font-family: monospace;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .terminal::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>IAP Reverse Proxy</h1>
+    <div class="inputs">
+        <div class="input">
+            <label for="frontend_url">Frontend URL :</label>
+            <input type="text" id="frontend_url" name="frontend_url" required>
+        </div>
+        <div class="input">
+            <label for="backend_url">Backend URL :</label>
+            <input type="text" id="backend_url" name="backend_url" required>
+        </div>
+        <div class="input">
+            <label for="proxy_port">Local proxy port :</label>
+            <input type="text" id="proxy_port" name="proxy_port" required>
+        </div>
+        <div class="input">
+            <label for="prefix_api">Prefix API :</label>
+            <input type="text" id="prefix_api" name="prefix_api" required>
+        </div>
+        <div class="dropzone">
+            <input type="file" id="key_file" name="key_file" accept=".json" class="inputfile">
+            <label for="key_file">Upload JSON key file</label>
+        </div>
+    </div>
+    <div class="buttons">
+        <button id="stop">🛑</button>
+        <button id="start">🚀</button>
+    </div>
+    <div class="terminal" id="terminal-log"></div>
+</div>
+<script>
+    document.querySelector('#start').addEventListener('click', () => {
+        const Store = require('electron-store');
+        const store = new Store();
+        store.set('backend_url', document.querySelector("input[name='backend_url']").value);
+        store.set('frontend_url', document.querySelector("input[name='frontend_url']").value);
+        store.set('proxy_port', document.querySelector("input[name='proxy_port']").value);
+        store.set('prefix_api', document.querySelector("input[name='prefix_api']").value);
+        store.set('key_file', document.querySelector("input[name='key_file']").files[0]?.path || store.get('key_file') || null);
+
+        const iapProxy = require('@electron/remote').require('./iap-proxy');
+        iapProxy.start(
+            document.querySelector("input[name='backend_url']").value,
+            document.querySelector("input[name='frontend_url']").value,
+            document.querySelector("input[name='key_file']").files[0]?.path || store.get('key_file') || null,
+            document.querySelector("input[name='proxy_port']").value,
+            document.querySelector("input[name='prefix_api']").value,
+        );
+    });
+
+    document.querySelector('#stop').addEventListener('click', () => {
+        const iapProxy = require('@electron/remote').require('./iap-proxy');
+        iapProxy.stop();
+    });
+
+    require('electron').ipcRenderer.on('log-data', function (event, msg) {
+        const term = document.getElementById('terminal-log');
+        term.innerText += `${msg}\n`;
+        term.scrollTop = term.scrollHeight;
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('key_file');
+        input.addEventListener('change', function (e) {
+            input.nextElementSibling.innerHTML = e.target.value.split('\\').pop() || input.nextElementSibling.innerHTML;
+        });
+
+        const Store = require('electron-store');
+        const store = new Store();
+        document.querySelector("input[name='backend_url']").value = store.get('backend_url') || null;
+        document.querySelector("input[name='frontend_url']").value = store.get('frontend_url') || null;
+        document.querySelector("input[name='proxy_port']").value = store.get('proxy_port') || null;
+        document.querySelector("input[name='prefix_api']").value = store.get('prefix_api') || null;
+
+        const keyFilePath = store.get('key_file');
+        if (keyFilePath) {
+            const path = require('path');
+            document.getElementById('key_file').nextElementSibling.innerHTML = keyFilePath.split(path.sep).pop();
+        }
+    });
+</script>
+</body>
+</html>
