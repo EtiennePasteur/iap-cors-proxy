@@ -107,3 +107,4 @@ dist
 /release-builds/
 /build
 /out
+package-lock.json

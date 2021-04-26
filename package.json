@@ -1,18 +1,26 @@
 {
-  "name": "reverse-proxy-iap",
-  "author": "Etienne PASTEUR <me@etiennepasteur.com>",
-  "productName": "IAP - CORS - Proxy",
-  "version": "1.0.0",
-  "description": "IAP - CORS - Proxy",
+  "name": "iap-cors-proxy",
+  "author": "Etienne PASTEUR",
+  "productName": "iap-cors-proxy",
+  "version": "1.0.1",
+  "description": "Reverse proxy to handle CORS and IAP Auth for easier frontend development",
   "homepage": "./",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "make-mac": "electron-forge make --platform darwin",
+    "make-linux": "electron-forge make --platform linux",
+    "make-windows": "electron-forge make --platform win32"
   },
-  "keywords": [],
-  "license": "ISC",
+  "keywords": [
+    "IAP",
+    "CORS",
+    "Proxy",
+    "Node.js"
+  ],
+  "license": "MIT",
   "dependencies": {
     "@electron/remote": "^1.1.0",
     "electron-squirrel-startup": "^1.0.0",
@@ -36,15 +44,14 @@
     "forge": {
       "packagerConfig": {
         "icon": "./assets/icons/icon",
-        "name": "IAP - CORS - Proxy",
-        "executableName": "reverse-proxy-iap"
+        "name": "iap-cors-proxy",
+        "executableName": "iap-cors-proxy"
       },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "IAP-CORS-Proxy",
-            "authors": "Etienne PASTEUR <me@etiennepasteur.com>"
+            "name": "iap-cors-proxy"
           }
         },
         {
