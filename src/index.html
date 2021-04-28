@@ -160,8 +160,8 @@
             <input type="text" id="proxy_port" name="proxy_port" required>
         </div>
         <div class="input">
-            <label for="prefix_api">Prefix API :</label>
-            <input type="text" id="prefix_api" name="prefix_api" required>
+            <label for="path_rewrite">Path rewrite :</label>
+            <input type="text" id="path_rewrite" name="path_rewrite" required>
         </div>
         <div class="dropzone">
             <input type="file" id="key_file" name="key_file" accept=".json" class="inputfile">
@@ -181,7 +181,7 @@
         store.set('backend_url', document.querySelector("input[name='backend_url']").value);
         store.set('frontend_url', document.querySelector("input[name='frontend_url']").value);
         store.set('proxy_port', document.querySelector("input[name='proxy_port']").value);
-        store.set('prefix_api', document.querySelector("input[name='prefix_api']").value);
+        store.set('path_rewrite', document.querySelector("input[name='path_rewrite']").value);
         store.set('key_file', document.querySelector("input[name='key_file']").files[0]?.path || store.get('key_file') || null);
 
         const iapProxy = require('@electron/remote').require('./iap-proxy');
@@ -190,7 +190,7 @@
             document.querySelector("input[name='frontend_url']").value,
             document.querySelector("input[name='key_file']").files[0]?.path || store.get('key_file') || null,
             document.querySelector("input[name='proxy_port']").value,
-            document.querySelector("input[name='prefix_api']").value,
+            document.querySelector("input[name='path_rewrite']").value,
         );
     });
 
@@ -216,7 +216,7 @@
         document.querySelector("input[name='backend_url']").value = store.get('backend_url') || null;
         document.querySelector("input[name='frontend_url']").value = store.get('frontend_url') || null;
         document.querySelector("input[name='proxy_port']").value = store.get('proxy_port') || null;
-        document.querySelector("input[name='prefix_api']").value = store.get('prefix_api') || null;
+        document.querySelector("input[name='path_rewrite']").value = store.get('path_rewrite') || null;
 
         const keyFilePath = store.get('key_file');
         if (keyFilePath) {

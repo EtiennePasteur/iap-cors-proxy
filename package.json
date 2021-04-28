@@ -2,7 +2,7 @@
   "name": "iap-cors-proxy",
   "author": "Etienne PASTEUR",
   "productName": "iap-cors-proxy",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Reverse proxy to handle CORS and IAP Auth for easier frontend development",
   "homepage": "./",
   "main": "src/main.js",
