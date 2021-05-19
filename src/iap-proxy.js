@@ -48,8 +48,8 @@ module.exports = {
         console.log('🛰️ ' + req.url);
 
         res.header("Access-Control-Allow-Origin", module.exports.frontendUrl);
-        res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-        res.header("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+        res.header("Access-Control-Allow-Methods", "*");
+        res.header("Access-Control-Allow-Headers", "*");
         if (req.method === 'OPTIONS') {
             return res.status(200).end();
         }
